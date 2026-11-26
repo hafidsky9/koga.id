@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin Koga</title>
+<style>
+*{box-sizing:border-box;margin:0}
+:root{--bg:#141414;--s:#262626;--s2:#2f2f2f;--ln:#2c2c2c;--tx:#f4f4f4;--mu:#9b9b9b;--ac:#dc3545;color-scheme:dark}
+body{font:14px/1.4 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);min-height:100dvh;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #fff;outline-offset:2px}
+button:active{opacity:.65}
+.mu{color:var(--mu)}.sm{font-size:12px}.b{font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px 40px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:22px 0 14px;gap:12px}
+h1{font-size:24px}
+.kg{font-weight:900;font-style:italic;color:var(--ac);letter-spacing:-2px;margin-right:6px}
+.btn{padding:12px 16px;border-radius:12px;background:var(--s);font-weight:700;text-align:center}
+.btn.r{background:var(--ac)}.btn.o{border:1px solid #444;background:none}
+.tabs{display:flex;border-bottom:1px solid var(--ln);overflow-x:auto;margin-bottom:18px}
+.tabs button{padding:12px;color:var(--mu);font-weight:600;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button.on{color:var(--tx);border-color:var(--ac)}
+.card{display:flex;gap:14px;background:#242424;border-radius:16px;padding:12px;margin-bottom:12px;align-items:center}
+.th{width:84px;height:84px;border-radius:10px;background:var(--s2);flex:none;display:grid;place-items:center;color:var(--mu);font-size:11px;overflow:hidden;text-align:center}
+.th img{width:100%;height:100%;object-fit:cover}
+.card .in{flex:1;min-width:0}
+.card .t{font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{display:inline-block;padding:2px 10px;border-radius:6px;font-size:12px;font-weight:700;background:var(--ac);margin-bottom:6px}
+.act{display:flex;flex-direction:column;gap:6px}
+.act .btn{padding:8px 14px;font-size:13px;background:#383838}.act .btn.o{background:none}
+.empty{text-align:center;padding:48px 16px;color:var(--mu);border:1px dashed #3a3a3a;border-radius:16px}
+.empty b{display:block;color:var(--tx);font-size:16px;margin-bottom:6px}
+label{display:block;color:var(--mu);font-size:12px;margin-bottom:14px}
+input,select,textarea{display:block;width:100%;margin-top:6px;background:#111;border:1px solid #3a3a3a;border-radius:10px;padding:12px;color:var(--tx);font:inherit;font-size:15px}
+textarea{min-height:90px;resize:vertical}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.err{color:#ff8a94;font-size:12px;min-height:18px;margin-bottom:8px}
+dialog{margin:auto;width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;background:#1b1b1f;color:var(--tx);border:1px solid var(--ln);border-radius:20px;padding:22px}
+dialog::backdrop{background:#000a}
+#login{max-width:380px;margin:12vh auto 0;padding:0 20px}
+#login h1{margin-bottom:6px}
+[hidden]{display:none!important}
+.row{display:flex;gap:10px;justify-content:flex-end;margin-top:6px;position:sticky;bottom:-22px;background:#1b1b1f;padding:12px 0 0}
+</style>
+</head>
+<body>
+
+<!-- Login admin: POST /api/login, server menolak akun non-admin -->
+<main id="login">
+  <h1><span class="kg">KG</span>Admin</h1>
+  <p class="mu" style="margin-bottom:24px">Masuk untuk mengelola konten dan event.</p>
+  <form id="lf" novalidate>
+    <label>Username<input name="u" autocomplete="username"></label>
+    <label>Password<input name="p" type="password" autocomplete="current-password"></label>
+    <p class="err" id="le" role="alert"></p>
+    <button class="btn r" style="width:100%" type="submit">Masuk</button>
+  </form>
+</main>
+
+<main class="wrap" id="app" hidden>
+  <div class="top"><h1><span class="kg">KG</span>Konten</h1><div style="display:flex;gap:8px"><button class="btn r" id="new">Buat Konten</button><button class="btn" id="out">Keluar</button></div></div>
+  <div class="tabs" id="tabs">
+    <button class="on" data-f="all">Semua</button><button data-f="artikel">Artikel</button><button data-f="streaming">Streaming</button><button data-f="esports">Esports</button><button data-f="patch">Catatan Patch</button>
+  </div>
+  <div id="list"></div>
+</main>
+
+<dialog id="dg">
+  <form id="cf" novalidate>
+    <h1 id="dt" style="font-size:20px;margin-bottom:16px">Buat Konten</h1>
+    <label>Jenis<select name="type" id="ty"><option value="artikel">Artikel</option><option value="streaming">Streaming</option><option value="esports">Esports (pertandingan)</option><option value="patch">Catatan Patch</option></select></label>
+    <label>Judul<input name="title" maxlength="120"></label>
+    <label>Deskripsi<textarea name="desc" maxlength="2000"></textarea></label>
+    <label>Gambar (jpg, png, webp, maks 2 MB)<input name="img" type="file" accept="image/jpeg,image/png,image/webp"></label>
+    <div id="es" hidden>
+      <div class="g"><label>Game<input name="game"></label><label>Turnamen<input name="tour"></label>
+      <label>Tim A<input name="ta"></label><label>Tim B<input name="tb"></label>
+      <label>Skor A<input name="sa" type="number" min="0"></label><label>Skor B<input name="sb" type="number" min="0"></label>
+      <label>Status<select name="st"><option value="akan">Akan datang</option><option value="live">Live</option><option value="selesai">Selesai</option></select></label>
+      <label>Format<input name="bo" placeholder="Best Of 3"></label></div>
+    </div>
+    <p class="err" id="ce" role="alert"></p>
+    <div class="row"><button class="btn o" type="button" id="cx">Batal</button><button class="btn r" type="submit">Simpan</button></div>
+  </form>
+</dialog>
+
+<script>
+const $=s=>document.querySelector(s);
+const T={artikel:'Artikel',streaming:'Streaming',esports:'Esports',patch:'Catatan Patch'};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let items=[],editId=null,flt='all';
+
+const showLogin=m=>{$('#app').hidden=true;$('#login').hidden=false;$('#le').textContent=m||''};
+const box=(t,x)=>`<div class="empty"><b>${t}</b>${x||''}</div>`;
+// Semua pemanggilan API lewat sini. Sesi habis (401) saat panel terbuka membawa kembali ke login.
+const api=async(u,o={})=>{
+  try{
+    const r=await fetch(u,{method:o.method||(o.json||o.form?'POST':'GET'),headers:o.json?{'Content-Type':'application/json'}:{},body:o.json?JSON.stringify(o.json):o.form});
+    const d=await r.json().catch(()=>({}));
+    if(r.status===401&&!$('#app').hidden)showLogin('Sesi habis. Masuk lagi.');
+    return{ok:r.ok,status:r.status,data:d};
+  }catch{return{ok:false,status:0,data:{error:'Tidak bisa terhubung ke server.'}}}
+};
+async function load(){
+  $('#list').innerHTML=box('Memuat...');
+  const r=await api('/api/admin/content');
+  if(r.ok){items=r.data.items;render();return}
+  if(r.status!==401)$('#list').innerHTML=box('Gagal memuat konten',`${esc(r.data.error||'')} <button class="b" id="retry" style="text-decoration:underline">Coba lagi</button>`);
+}
+const enter=()=>{$('#login').hidden=true;$('#app').hidden=false;load()};
+$('#list').addEventListener('click',e=>{if(e.target.id==='retry')load()});
+$('#lf').addEventListener('submit',async e=>{
+  e.preventDefault();const f=e.target;
+  if(!f.u.value.trim()||!f.p.value){$('#le').textContent='Isi username dan password.';return}
+  $('#le').textContent='';const b=f.querySelector('button');b.disabled=true;
+  const r=await api('/api/login',{json:{id:f.u.value.trim(),password:f.p.value,admin:true}});
+  b.disabled=false;
+  if(!r.ok){$('#le').textContent=r.data.error||'Gagal masuk.';return}
+  f.reset();enter();
+});
+$('#out').onclick=async()=>{await api('/api/logout',{method:'POST'});showLogin();$('#lf').reset()};
+api('/api/me').then(r=>{if(r.ok&&r.data.user.role==='admin')enter()});
+
+$('#tabs').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  flt=b.dataset.f;[...$('#tabs').children].forEach(x=>x.classList.toggle('on',x===b));render();
+});
+
+function render(){
+  const v=items.filter(i=>flt==='all'||i.type===flt);
+  $('#list').innerHTML=v.length?v.map(i=>`
+    <div class="card"><div class="th">${i.img?`<img src="${esc(i.img)}" alt="">`:'Tanpa gambar'}</div>
+      <div class="in"><span class="badge">${T[i.type]}</span><div class="t">${esc(i.title)}</div>
+      <div class="mu sm">${i.type==='esports'?esc(i.ta)+' '+esc(i.sa)+' : '+esc(i.sb)+' '+esc(i.tb):esc(new Date(i.date).toLocaleDateString('id-ID'))}</div></div>
+      <div class="act"><button class="btn" data-e="${i.id}">Edit</button><button class="btn o" data-d="${i.id}">Hapus</button></div></div>`).join('')
+    :`<div class="empty"><b>Belum ada konten</b>Tekan Buat Konten untuk menambah artikel, streaming, pertandingan, atau catatan patch.</div>`;
+}
+$('#list').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.d&&confirm('Hapus konten ini?'))api('/api/admin/content/'+b.dataset.d,{method:'DELETE'}).then(r=>{
+    if(r.ok){items=items.filter(i=>i.id!=b.dataset.d);render()}else if(r.status!==401)alert(r.data.error||'Gagal menghapus.');
+  });
+  if(b.dataset.e)open(items.find(i=>i.id==b.dataset.e));
+});
+
+const dg=$('#dg'),cf=$('#cf');
+const tog=()=>{$('#es').hidden=$('#ty').value!=='esports'};
+$('#ty').onchange=tog;
+$('#new').onclick=()=>open();
+$('#cx').onclick=()=>dg.close();
+function open(i){
+  editId=i?i.id:null;cf.reset();$('#ce').textContent='';
+  $('#dt').textContent=i?'Edit Konten':'Buat Konten';
+  if(i)for(const[k,v]of Object.entries({type:i.type,title:i.title,desc:i.desc,game:i.game,tour:i.tour,ta:i.ta,tb:i.tb,sa:i.sa,sb:i.sb,st:i.st,bo:i.bo}))if(cf.elements[k])cf.elements[k].value=v??'';
+  tog();dg.showModal();
+}
+cf.addEventListener('submit',async e=>{
+  e.preventDefault();const f=cf.elements,file=f.img.files[0];
+  const err=m=>{$('#ce').textContent=m};
+  if(!f.title.value.trim())return err('Judul wajib diisi.');
+  if(f.type.value==='esports'&&!f.game.value.trim())return err('Game wajib diisi.');
+  if(f.type.value==='esports'&&(!f.ta.value.trim()||!f.tb.value.trim()))return err('Nama Tim A dan Tim B wajib diisi.');
+  if(file&&!['image/jpeg','image/png','image/webp'].includes(file.type))return err('Gambar harus jpg, png, atau webp.');
+  if(file&&file.size>2*1024*1024)return err('Gambar maksimal 2 MB.');
+  err('');const btn=cf.querySelector('[type=submit]');btn.disabled=true;
+  const r=await api(editId?'/api/admin/content/'+editId:'/api/admin/content',{method:editId?'PUT':'POST',form:new FormData(cf)});
+  btn.disabled=false;
+  if(!r.ok)return err(r.data.error||'Gagal menyimpan.');
+  items=editId?items.map(i=>i.id===editId?r.data:i):[r.data,...items];
+  dg.close();render();
+});
+</script>
+</body>
+</html>

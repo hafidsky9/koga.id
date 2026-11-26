@@ -1,0 +1,41 @@
+services:
+  koga:
+    build: .
+    container_name: koga
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PORT: "3000" # port di dalam kontainer; port di STB diatur HOST_PORT
+    ports:
+      - "${HOST_PORT:-3000}:3000"
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+    mem_limit: 256m
+  coturn:
+    image: coturn/coturn:4.19.1
+    profiles: ["turn"]
+    restart: unless-stopped
+    # Host network pada STB/VPS Linux agar alamat/port relay tidak berubah di bridge Docker.
+    network_mode: host
+    environment:
+      TURN_SECRET: "${TURN_SECRET:-}"
+      TURN_EXTERNAL_IP: "${TURN_EXTERNAL_IP:-}"
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        test -n "$$TURN_SECRET" || { echo 'TURN_SECRET wajib diisi untuk profile turn'; exit 1; }
+        set --
+        if [ -n "$$TURN_EXTERNAL_IP" ]; then set -- "--external-ip=$$TURN_EXTERNAL_IP"; fi
+        exec turnserver -n --fingerprint --listening-port=3478 --min-port=49152 --max-port=49200 \
+          --realm=koga --use-auth-secret --static-auth-secret="$$TURN_SECRET" \
+          --no-cli --no-tls --no-dtls --no-multicast-peers --no-tcp-relay \
+          --denied-peer-ip=10.0.0.0-10.255.255.255 \
+          --denied-peer-ip=172.16.0.0-172.31.255.255 \
+          --denied-peer-ip=192.168.0.0-192.168.255.255 \
+          --denied-peer-ip=169.254.0.0-169.254.255.255 \
+          --denied-peer-ip=100.64.0.0-100.127.255.255 \
+          --denied-peer-ip=127.0.0.0-127.255.255.255 \
+          --denied-peer-ip=::1 --denied-peer-ip=fc00::-fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff \
+          --denied-peer-ip=fe80::-febf:ffff:ffff:ffff:ffff:ffff:ffff:ffff \
+          --user-quota=0 --total-quota=40 --log-file=stdout "$$@"

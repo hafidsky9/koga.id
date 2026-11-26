@@ -1,0 +1,28 @@
+{
+  "name": "koga",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Koga tahap 3: sosial, komunitas, voice P2P dan QR teman",
+  "main": "server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "smoke": "node test/smoke.js",
+    "postinstall": "node scripts/vendor-qr.js",
+    "test:voice": "node test/voice-unit.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^12.11.1",
+    "express": "^4.22.3",
+    "express-rate-limit": "^8.7.5",
+    "express-session": "^1.19.0",
+    "helmet": "^8.3.0",
+    "multer": "^2.5.0",
+    "ws": "8.21.3",
+    "qrcode": "1.5.4",
+    "jsqr": "1.4.0"
+  }
+}

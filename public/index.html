@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Koga</title>
+<style>
+*{box-sizing:border-box;margin:0}
+:root{--bg:#141414;--bg2:#1b1b1f;--s:#262626;--s2:#2f2f2f;--ln:#2c2c2c;--tx:#f4f4f4;--mu:#9b9b9b;--ac:#dc3545;--gr:#2ecc8f;--bl:#29b6d6;--ye:#f5c518;color-scheme:dark}
+body{font:14px/1.4 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:#000;color:var(--tx);display:grid;place-items:center;min-height:100dvh}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:inherit}
+button:active{opacity:.65}
+@media(hover:hover){button:hover{opacity:.85}#nav button:hover,.tabs button:hover{opacity:1;color:var(--tx)}}
+button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+i{font-style:normal;display:inline-flex}
+svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.phone{position:relative;width:393px;height:852px;background:var(--bg);overflow:hidden;border-radius:36px;box-shadow:0 0 0 1px #2a2a2a}
+@media(max-width:430px){.phone{width:100vw;height:100dvh;border-radius:0}}
+.scr{position:absolute;inset:0;display:none;flex-direction:column;padding-top:env(safe-area-inset-top,0)}
+.scr.on{display:flex}
+.c{background:var(--bg2)}
+.bd{flex:1;overflow-y:auto;padding:0 20px 92px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 14px;gap:12px}
+h1{font-size:26px;font-weight:700}
+h2{font-size:15px;font-weight:700;margin:18px 0 10px}
+.mu{color:var(--mu)}.sm{font-size:12px}.b{font-weight:700}
+.ic{width:40px;height:40px;border-radius:10px;background:var(--s);display:grid;place-items:center;flex:none}
+.ic.n{background:none}
+.tabs{display:flex;border-bottom:1px solid var(--ln);padding:0 8px;overflow-x:auto;flex:none}
+.tabs button{padding:12px;color:var(--mu);font-weight:600;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button.on{color:var(--tx);border-color:var(--ac)}
+.pn{display:none}.pn.on{display:block}
+.card{background:#242424;border-radius:16px;overflow:hidden;margin-bottom:14px}
+.ph{background:var(--s2);color:var(--mu);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:12px;text-align:center}
+.ph svg{width:30px;height:30px}
+.cp{padding:14px 16px}
+.row{display:flex;align-items:center;gap:12px}.sp{justify-content:space-between}
+.btn{display:block;width:100%;padding:14px;border-radius:12px;background:var(--s);font-weight:700;text-align:center}
+.btn.row{display:flex;align-items:center;justify-content:center;gap:10px}
+.btn.r{background:var(--ac)}.btn.w{background:#fff;color:#111}.btn.o{background:none;border:1px solid var(--ac);color:#ff6b78}
+.badge{display:inline-block;padding:2px 10px;border-radius:6px;font-size:12px;font-weight:700;background:var(--ac)}
+.live{background:var(--ac);border-radius:99px;padding:3px 10px;font-size:12px;font-weight:700}
+.av{width:44px;height:44px;border-radius:50%;background:var(--s);display:grid;place-items:center;flex:none;position:relative;color:var(--mu)}
+.dot{position:absolute;right:-1px;bottom:-1px;width:14px;height:14px;border-radius:50%;border:2px solid var(--bg);background:var(--mu)}
+/* nav */
+#nav{position:absolute;left:0;right:0;bottom:0;display:flex;background:var(--bg);border-top:1px solid var(--ln);padding:10px 4px calc(18px + env(safe-area-inset-bottom,0));z-index:5}
+#nav[hidden]{display:none}
+#nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--mu);font-weight:500;position:relative}
+#nav button.on{color:var(--tx);font-weight:700}
+#nav button.on.k{color:var(--ac)}
+.kg{font-weight:900;font-style:italic;font-size:22px;line-height:22px;height:22px;color:var(--ac);letter-spacing:-2px}
+.nd{position:absolute;top:-2px;left:calc(50% + 6px);width:8px;height:8px;border-radius:50%;background:var(--ac)}
+/* welcome */
+#welcome .ph{flex:1;background:var(--s);border-radius:0}
+.sheet{background:#101010;padding:28px 32px 40px;text-align:center}
+.sheet h2{font-size:22px;margin:0 0 10px}
+.sheet .btn+.btn{margin-top:12px}
+.soc{display:flex;gap:16px;justify-content:center;margin-top:24px}
+.soc button{width:52px;height:52px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:22px}
+/* profil */
+.cover{height:120px;margin:0 -20px}
+.pav{width:88px;height:88px;border-radius:50%;border:4px solid #111;background:var(--s);margin:-44px 0 0;display:grid;place-items:center;color:var(--ac);position:relative}
+.pav .dot{width:16px;height:16px;background:var(--gr);right:2px;bottom:6px;border-color:#111}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g2 .card{margin:0}
+.g2 .ph{height:110px;padding-bottom:22px}
+.g2 .badge{margin:-26px 0 0 12px;position:relative}
+/* settings */
+.set button{display:flex;align-items:center;gap:16px;width:100%;padding:24px 0;border-bottom:1px solid var(--ln);font-size:15px}
+.set svg{color:#ff6b78}
+/* feed */
+.chips{display:flex;gap:10px;align-items:center;padding:0 20px 14px;overflow-x:auto;flex:none}
+.chip{width:52px;height:52px;border-radius:14px;background:var(--s);display:grid;place-items:center;flex:none;color:var(--mu)}
+.chip.on{border:2px solid #fff;color:var(--tx)}
+.stream{padding:14px}
+.stream .ph{height:90px;background:none}
+.pill{background:#111;border-radius:99px;padding:4px 12px;font-size:12px;font-weight:700}
+.score{font-size:18px;font-weight:700;color:var(--mu)}
+.hero{margin:0 -20px;padding:20px;background:#222}
+/* esports */
+.gsel>button{display:flex;align-items:center;gap:8px;background:var(--s);border-radius:10px;padding:10px 14px;color:#ff6b78;font-weight:700;font-size:12px}
+#esports .top{position:relative}
+.gsel{position:static}
+#gmenu{position:absolute;left:12px;right:12px;top:76px;background:#1f1f22;border:1px solid var(--ln);border-radius:14px;padding:10px;z-index:4;display:none}
+#gmenu.on{display:block}
+#gmenu button{display:flex;align-items:center;gap:14px;width:100%;padding:16px;border-radius:10px;background:var(--s);margin-bottom:8px;font-weight:700;font-size:15px;border:2px solid transparent}
+#gmenu button.on{border-color:var(--ac)}
+#gmenu button.on::after{content:"";margin-left:auto;width:26px;height:26px;border-radius:50%;background:var(--ac) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12l4 4 8-9'/%3E%3C/svg%3E") center/16px no-repeat}
+.tur{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;flex:none;position:relative}
+.tur .chip{width:56px;height:56px}
+.tur .live{position:absolute;top:40px;font-size:10px;padding:1px 8px}
+.match .ph{height:170px}
+.team{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px}
+.team b{width:34px;height:34px;border-radius:8px;background:var(--s2);display:grid;place-items:center;color:var(--mu)}
+.team svg{width:18px;height:18px}
+.rd{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-top:1px solid var(--ln);font-weight:700}
+/* sosial */
+.sch{display:flex;align-items:center;gap:10px;background:var(--s);border-radius:12px;padding:12px 14px;margin:16px 0;color:var(--mu)}
+.sch input{flex:1;background:none;border:0;color:var(--tx);font:inherit;outline:0}
+.grp{display:flex;justify-content:space-between;color:var(--mu);font-weight:700;margin:14px 0 6px}
+.fr{display:flex;align-items:center;gap:14px;padding:10px 0}
+.fr .b{font-size:16px;display:block}
+.fab{position:absolute;right:20px;bottom:100px;width:52px;height:52px;border-radius:14px;background:var(--ac);display:grid;place-items:center}
+.rq{padding:14px}
+.rq .row+.row{margin-top:12px}.rq .btn{padding:10px;font-size:13px}
+.rq .btn:not(.r){background:none;border:1px solid #444}
+/* qr */
+.qr{width:100%;aspect-ratio:1;border-radius:16px}
+/* komunitas */
+.cm{flex:1;display:flex;min-height:0}
+.rail{width:76px;background:#101012;padding:30px 10px 92px;display:flex;flex-direction:column;gap:12px;align-items:center;overflow-y:auto}
+.rail button{width:56px;height:56px;border-radius:16px;background:var(--s);display:grid;place-items:center;position:relative;color:var(--mu);flex:none}
+.rail .on::before{content:"";position:absolute;left:-10px;top:14px;width:4px;height:28px;background:#fff;border-radius:0 4px 4px 0}
+.rail .add.on{background:var(--ac);color:#fff}
+.rail em{position:absolute;bottom:-4px;right:-4px;background:var(--ac);border-radius:99px;font:700 11px/1 inherit;padding:3px 6px;font-style:normal;border:2px solid #101012}
+.chn{flex:1;padding:30px 12px 92px;overflow-y:auto;min-width:0}
+.cat{color:var(--mu);font-size:12px;margin:18px 0 6px 4px}
+.ch{display:flex;align-items:center;gap:12px;width:100%;padding:9px 10px;border-radius:8px;color:var(--mu);font-size:15px}
+.ch.u{color:var(--tx);font-weight:700}.ch.on{background:#2c2c32;color:var(--tx);font-weight:700}
+.ch svg{width:22px;height:22px}
+.msg{display:flex;gap:12px;margin-bottom:18px}
+.msg p{margin-top:2px}
+.reply{font-size:12px;color:var(--mu);margin:0 0 4px 12px}
+.men{background:#33406b;color:#aebcff;border-radius:4px;padding:1px 6px;font-weight:600}
+.react{display:inline-flex;gap:6px;background:var(--s);border-radius:8px;padding:5px 10px;margin-top:6px;color:var(--mu);font-size:12px}
+.day{display:flex;align-items:center;gap:12px;color:var(--mu);font-size:12px;margin:6px 0 18px}
+.day::before,.day::after{content:"";flex:1;height:1px;background:var(--ln)}
+.cmp{display:flex;align-items:center;gap:14px;background:var(--s);border-radius:22px;padding:10px 16px;margin:0 12px 92px;color:var(--mu)}
+.cmp input{flex:1;min-width:0;background:none;border:0;color:var(--tx);font:inherit;outline:0}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:70px 16px 0;flex:1;align-content:start}
+.vt{aspect-ratio:1/1.05;border-radius:14px;background:var(--s);position:relative;display:grid;place-items:center;color:var(--mu)}
+.vt span{position:absolute;left:8px;bottom:8px;background:#111;border-radius:6px;padding:4px 14px;color:var(--tx);font-size:12px}
+.vbar{display:flex;justify-content:space-around;align-items:center;background:#111;border-radius:16px;margin:0 16px 96px;padding:18px 8px 12px}
+.vbar button{width:44px;height:44px;display:grid;place-items:center;border-radius:12px}
+.vbar .end{background:var(--ac);width:52px;height:52px}
+.opt{background:var(--s);border-radius:14px;overflow:hidden}
+.opt button{display:flex;align-items:center;gap:14px;width:100%;padding:16px;border-bottom:1px solid var(--ln);font-size:15px}
+.opt button:last-child{border:0}
+.ctr{text-align:center}.ctr h1{font-size:23px;margin-bottom:8px}
+.up{width:88px;height:88px;border:2px dashed var(--mu);border-radius:50%;margin:28px auto;display:grid;place-items:center;font-size:11px;font-weight:700;position:relative;text-align:center}
+.up .pl{position:absolute;top:-4px;right:-4px;width:28px;height:28px;border-radius:50%;background:var(--ac);display:grid;place-items:center}
+.up .pl svg{width:16px}
+.fld{width:100%;background:#111;border:1px solid var(--ac);border-radius:10px;padding:14px;color:var(--tx);font:inherit;margin:8px 0}
+a{color:#6aa8ff}
+[data-go]{cursor:pointer}
+.fld2{display:block;text-align:left;margin-bottom:14px;color:var(--mu);font-size:12px}
+.fld2 input{display:block;width:100%;margin-top:6px;background:#111;border:1px solid #3a3a3a;border-radius:10px;padding:14px;color:var(--tx);font:inherit;font-size:15px}
+.fld2 input:focus{outline:2px solid #fff;outline-offset:1px}
+.err{color:#ff8a94;font-size:12px;min-height:18px;text-align:left;margin:0 0 10px}
+#toast{position:absolute;left:50%;bottom:110px;transform:translateX(-50%);background:#fff;color:#111;padding:10px 18px;border-radius:99px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9;white-space:nowrap}
+#toast.on{opacity:1}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="img" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.6"/><path d="M21 15l-5-5L5 21"/></symbol>
+<symbol id="gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5l1.4.2.6 2.3 1.6.9 2.2-.8 1.7 2-1 2.1.2 1.8 1.9 1.4-.5 2.6-2.3.4-1.2 1.4.3 2.3-2.4 1.2-1.8-1.5h-1.8L9.7 21l-2.4-1.2.3-2.3-1.2-1.4-2.3-.4-.5-2.6 1.9-1.4.2-1.8-1-2.1 1.7-2 2.2.8 1.6-.9.6-2.3z"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+<symbol id="share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></symbol>
+<symbol id="iqr" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M8 8h3v3H8zM13 8h3M13 13h3v3M8 14v2"/></symbol>
+<symbol id="art" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
+<symbol id="cup" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0zM7 6H4v1a3 3 0 003 3M17 6h3v1a3 3 0 01-3 3"/></symbol>
+<symbol id="usr" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0113 0"/><circle cx="17" cy="9" r="2.5"/><path d="M17.5 14.2a5 5 0 014 5"/></symbol>
+<symbol id="me" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></symbol>
+<symbol id="find" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></symbol>
+<symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="dn" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+<symbol id="hash" viewBox="0 0 24 24"><path d="M5 9h14M5 15h14M10 3L8 21M16 3l-2 18"/></symbol>
+<symbol id="spk" viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4zM15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13"/></symbol>
+<symbol id="mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></symbol>
+<symbol id="cam" viewBox="0 0 24 24"><path d="M15 10l6-3v10l-6-3M3 6h10a2 2 0 012 2v8M3 6v10a2 2 0 002 2h8M3 3l18 18"/></symbol>
+<symbol id="cam2" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+<symbol id="ph" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M12 15V8M9.5 10.5L12 8l2.5 2.5"/></symbol>
+<symbol id="fun" viewBox="0 0 24 24"><path d="M4 20l4-12 8 8zM14 4v2M19 9h2M17 5l1-1"/></symbol>
+<symbol id="end" viewBox="0 0 24 24"><path d="M3 14c5-5 13-5 18 0l-2 3-3-1.5V13c-2-.7-4-.7-6 0v2.5L5 17z"/></symbol>
+<symbol id="bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8M10 21a2 2 0 004 0"/></symbol>
+<symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16zM13 7l4 4"/></symbol>
+<symbol id="play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="cp" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 012-2h8"/></symbol>
+<symbol id="mp" viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11.5 7L4 20l1.2-4.5A8 8 0 1121 12zM12 9v6M9 12h6"/></symbol>
+<symbol id="shd" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4"/></symbol>
+<symbol id="glb" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></symbol>
+<symbol id="out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+<symbol id="del" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+<symbol id="mon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></symbol>
+<symbol id="mob" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></symbol>
+<symbol id="sl" viewBox="0 0 24 24"><path d="M4 7h8M16 7h4M4 17h4M12 17h8"/><circle cx="14" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></symbol>
+<symbol id="mre" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></symbol>
+<symbol id="rt" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+<symbol id="arr" viewBox="0 0 24 24"><path d="M4 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="smi" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14a5 5 0 008 0M9 9.5h.01M15 9.5h.01"/></symbol>
+<symbol id="up" viewBox="0 0 24 24"><path d="M7 11v9H4v-9zM7 11l4-7c1.5 0 2.5 1 2 3l-.5 3H19a2 2 0 012 2.3l-1 6a2 2 0 01-2 1.7H7"/></symbol>
+<symbol id="gft" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4"/><path d="M5 12v9h14v-9M12 8v13M12 8C8 8 8 3 12 8c4-5 4 0 0 0"/></symbol>
+<symbol id="dsh" viewBox="0 0 24 24"><path d="M4 12h16"/></symbol>
+</defs></svg>
+
+<div class="phone">
+
+<!-- 01 Mulai -->
+<section class="scr" id="welcome" data-nav="0">
+  <div class="ph"><i data-i="img"></i><span>Ilustrasi tampilan</span></div>
+  <div class="sheet">
+    <h2>Selamat datang di<br>Koga</h2>
+    <p class="mu" style="margin-bottom:22px">Log in untuk mendapatkan informasi terkini, memeriksa profil, menonton esports, dan chat dengan teman.</p>
+    <button class="btn w" data-go="auth" data-open="d">Register</button>
+    <button class="btn" data-go="auth" data-open="m">Log In</button>
+    <div class="soc">
+      <button style="background:#fff;color:#4285f4" aria-label="Google" data-soon>G</button>
+      <button style="background:#fff;color:#111" aria-label="Apple" data-soon>A</button>
+      <button style="background:#1877f2" aria-label="Facebook" data-soon>f</button>
+    </div>
+  </div>
+</section>
+
+<!-- Auth -->
+<section class="scr" id="auth" data-nav="0">
+  <div class="top" style="justify-content:flex-start"><button class="ic n" data-back aria-label="Kembali"><i data-i="back"></i></button><h1 style="font-size:22px">Masuk ke Koga</h1></div>
+  <div class="tabs"><button class="on" data-t="m">Log In</button><button data-t="d">Register</button></div>
+  <div class="bd" style="padding-top:26px">
+    <form class="pn on" data-p="m" data-next="profil" novalidate>
+      <label class="fld2">Email atau username<input name="id" autocomplete="username"></label>
+      <label class="fld2">Password<input name="pw" type="password" autocomplete="current-password"></label>
+      <p class="err" role="alert"></p>
+      <button class="btn r" type="submit">Log In</button>
+      <button class="btn" type="button" style="margin-top:12px;font-weight:600" data-soon>Lupa password</button>
+    </form>
+    <form class="pn" data-p="d" data-next="profil" novalidate>
+      <label class="fld2">Username<input name="u" autocomplete="username"></label>
+      <label class="fld2">Email<input name="e" type="email" autocomplete="email"></label>
+      <label class="fld2">Password<input name="pw" type="password" autocomplete="new-password"></label>
+      <label class="fld2">Konfirmasi password<input name="pw2" type="password" autocomplete="new-password"></label>
+      <p class="err" role="alert"></p>
+      <button class="btn r" type="submit">Register</button>
+    </form>
+  </div>
+</section>
+
+<!-- Detail konten -->
+<section class="scr" id="detail" data-nav="0">
+  <div class="top"><button class="ic n" data-back aria-label="Kembali"><i data-i="back"></i></button><button class="ic n" data-soon aria-label="Bagikan"><i data-i="share"></i></button></div>
+  <div class="bd" style="padding-top:0">
+    <div class="ph" id="dimg" style="height:210px;border-radius:16px;overflow:hidden"><i data-i="img"></i><span>Foto konten</span></div>
+    <span class="badge" id="dtype" style="margin:18px 0 10px"></span>
+    <h1 id="dtitle" style="font-size:22px;overflow-wrap:anywhere"></h1>
+    <p class="mu sm" id="ddate" style="margin:8px 0 18px"></p>
+    <p id="dbody" style="white-space:pre-wrap;overflow-wrap:anywhere"></p>
+  </div>
+</section>
+
+<!-- Profil -->
+<section class="scr" id="profil" data-tab="profil">
+  <div class="top"><h1>Profil</h1><button class="ic n" data-go="pengaturan" aria-label="Pengaturan"><i data-i="gear"></i></button></div>
+  <div class="bd">
+    <div class="ph cover"><i data-i="img"></i><span>Foto sampul</span></div>
+    <div class="pav"><i data-i="img"></i><span class="dot"></span></div>
+    <div class="row" style="margin-top:12px;gap:40px"><span class="b" id="pname" style="font-size:18px;overflow-wrap:anywhere"></span><span class="mu b" id="pnum" style="font-size:16px"></span></div>
+    <p class="mu" id="pstat" style="margin:6px 0 14px"></p>
+    <button class="btn row" style="font-weight:400;color:var(--mu);justify-content:flex-start;gap:12px;padding:12px 14px" data-soon><i data-i="pen"></i>Atur Status</button>
+    <h2 style="margin-top:22px">Riwayat</h2>
+    <div style="text-align:center;padding:32px 16px;color:var(--mu);border:1px dashed #3a3a3a;border-radius:16px"><b style="display:block;color:var(--tx);font-size:16px;margin-bottom:6px">Belum ada riwayat</b>Riwayat pertandingan belum tersedia. Lihat jadwal dan hasil di Esports.</div>
+    <button class="btn row" style="justify-content:center;gap:10px;margin-top:16px" data-go="esports"><i data-i="cup"></i>Riwayat Pertandingan</button>
+  </div>
+</section>
+
+<!-- Pengaturan -->
+<section class="scr" id="pengaturan" data-nav="0">
+  <div class="top" style="justify-content:flex-start"><button class="ic n" data-back aria-label="Kembali"><i data-i="back"></i></button><h1 style="font-size:22px">Pengaturan</h1></div>
+  <div class="bd set">
+    <button data-go="teman"><i data-i="usr"></i>Sosial</button>
+    <button data-soon><i data-i="shd"></i>Autentikasi Multifaktor</button>
+    <button data-go="qr"><i data-i="iqr"></i>Pindai Kode QR</button>
+    <button data-go="esports"><i data-i="cup"></i>Esports</button>
+    <button data-soon><i data-i="bell"></i>Notifikasi</button>
+    <button data-soon><i data-i="glb"></i>Bahasa</button>
+    <button data-logout><i data-i="out"></i>Logout</button>
+    <button data-soon><i data-i="del"></i>Hapus Akun</button>
+  </div>
+</section>
+
+<!-- 02 Feed artikel -->
+<section class="scr" id="artikel" data-tab="artikel">
+  <div class="top"><h1>Feed Artikel</h1><button class="ic" data-go="qr" aria-label="Pindai kode QR"><i data-i="iqr"></i></button></div>
+  <div class="chips"><button class="chip on b sm">Semua</button><button class="chip"><i data-i="img"></i></button><button class="chip"><i data-i="img"></i></button><button class="chip"><i data-i="img"></i></button><button class="chip"><i data-i="img"></i></button><button class="ic n" data-soon aria-label="Filter"><i data-i="sl"></i></button></div>
+  <div class="tabs"><button class="on" data-t="a">Artikel</button><button data-t="s">Streaming</button><button data-t="e">Esports</button><button data-t="p">Catatan Patch</button></div>
+  <div class="bd" style="padding-top:20px">
+    <div class="pn on" data-p="a"><h2 style="font-size:16px;margin-top:0">Terkini</h2><div id="fa"></div></div>
+    <div class="pn" data-p="s"><div id="fs"></div></div>
+    <div class="pn" data-p="e">
+      <div class="row sp"><h2 style="margin:0">Pertandingan Terkini</h2><button class="b sm row" style="gap:6px;color:var(--tx)" data-go="esports">Lihat Semua <i data-i="rt" style="color:var(--ac)"></i></button></div>
+      <div id="fe" style="margin-top:14px"></div>
+    </div>
+    <div class="pn" data-p="p"><div id="fp"></div></div>
+  </div>
+</section>
+
+<!-- 03 Esports -->
+<section class="scr" id="esports" data-tab="esports">
+  <div class="top"><h1>Esports</h1>
+    <div class="row"><div class="gsel"><button id="gbtn" aria-expanded="false"><span id="glbl">Game</span><i data-i="dn" style="width:14px"></i></button>
+      <div id="gmenu"></div></div>
+      <button data-soon aria-label="Lainnya"><i data-i="mre"></i></button></div></div>
+  <div class="chips" id="tours" style="align-items:flex-start"></div>
+  <div class="tabs"><button class="on" data-t="u">Akan Datang</button><button data-t="l">Pertandingan Sebelumnya</button></div>
+  <div class="bd" style="padding-top:16px">
+    <div class="pn on" data-p="u"><div id="mnext"></div></div>
+    <div class="pn" data-p="l"><div id="mprev"></div></div>
+  </div>
+</section>
+
+<!-- 04 Sosial -->
+<section class="scr" id="teman" data-tab="teman">
+  <div class="top"><h1>Sosial</h1><div class="row"><button class="ic" data-go="qr" aria-label="Kode QR"><i data-i="iqr"></i></button><button data-soon aria-label="Lainnya"><i data-i="mre"></i></button></div></div>
+  <div class="tabs"><button class="on" data-t="t">Teman</button><button data-t="m">Pesan</button><button data-t="r">Permintaan</button></div>
+  <div class="bd">
+    <div class="pn on" data-p="t">
+      <label class="sch"><i data-i="find"></i><input placeholder="Cari" aria-label="Cari teman"></label>
+      <div class="grp"><span>Dalam Game &nbsp;2</span><i data-i="dn" style="transform:rotate(180deg)"></i></div>
+      <div class="fr"><span class="av"><i data-i="img"></i><span class="dot" style="background:var(--bl)"></span></span><div><b>Nama Teman</b><span class="mu sm row" style="gap:6px"><i data-i="mon" style="width:14px"></i>Bermain - Nama game</span></div></div>
+      <div class="fr"><span class="av"><i data-i="img"></i><span class="dot" style="background:var(--bl)"></span></span><div><b>Nama Teman</b><span class="mu sm row" style="gap:6px"><i data-i="mon" style="width:14px"></i>Bermain - Nama Game</span></div></div>
+      <div class="grp"><span>Online &nbsp;6</span><i data-i="dn" style="transform:rotate(180deg)"></i></div>
+      <div class="fr"><span class="av"><i data-i="img"></i><span class="dot" style="background:var(--ye)"></span></span><div><b>Nama Teman</b><span class="mu sm row" style="gap:6px"><i data-i="mob" style="width:14px"></i>Tidak di tempat - Nama Game</span></div></div>
+      <div class="fr"><span class="av"><i data-i="img"></i><span class="dot" style="background:var(--ye)"></span></span><div><b>Nama Teman</b><span class="mu sm row" style="gap:6px"><i data-i="mob" style="width:14px"></i>Tidak di tempat - Nama Game</span></div></div>
+      <div class="fr"><span class="av"><i data-i="img"></i><span class="dot" style="background:var(--ye)"></span></span><div><b>Nama Teman</b><span class="mu sm row" style="gap:6px"><i data-i="mob" style="width:14px"></i>Tidak di tempat - Nama Game</span></div></div>
+    </div>
+    <div class="pn" data-p="m">
+      <div class="fr" style="padding:16px 0"><span class="av"><i data-i="img"></i><span class="dot"></span></span><div style="flex:1"><div class="row sp"><b>Nama Teman</b><span class="mu sm">Baru saja</span></div><span class="mu">Isi pesan terakhir terkirim</span></div></div>
+      <div class="fr" style="padding:16px 0"><span class="av"><i data-i="img"></i><span class="dot"></span></span><div style="flex:1"><div class="row sp"><b>Nama Teman</b><span class="mu sm">5 menit</span></div><span class="mu">Isi pesan terakhir terkirim</span></div></div>
+      <div class="fr" style="padding:16px 0"><span class="av"><i data-i="img"></i><span class="dot"></span></span><div style="flex:1"><div class="row sp"><b>Nama Teman</b><span class="mu sm">12 menit</span></div><span class="mu">Isi pesan terakhir terkirim</span></div></div>
+      <div class="fr" style="padding:16px 0"><span class="av"><i data-i="img"></i><span class="dot"></span></span><div style="flex:1"><div class="row sp"><b>Nama Teman</b><span class="mu sm">30 menit</span></div><span class="mu">Isi pesan terakhir terkirim</span></div></div>
+      <div class="fr" style="padding:16px 0"><span class="av"><i data-i="img"></i><span class="dot"></span></span><div style="flex:1"><div class="row sp"><b>Nama Teman</b><span class="mu sm">1 jam</span></div><span class="mu">Isi pesan terakhir terkirim</span></div></div>
+      <button class="fab" data-soon aria-label="Pesan baru"><i data-i="mp"></i></button>
+    </div>
+    <div class="pn" data-p="r">
+      <button class="btn row" style="justify-content:center;gap:10px;font-weight:600;margin-top:16px" data-soon>Salin ID Riot-ku <i data-i="cp" style="width:16px"></i></button>
+      <div class="row sp" style="margin:22px 0 12px"><b>Permintaan pertemanan</b><span class="mu" id="rqn">3</span></div>
+      <div class="card rq"><div class="row"><span class="av"><i data-i="img"></i></span><div><b>Nama Teman</b><div class="mu sm">#12345 · Baru saja</div></div></div><div class="row"><button class="btn" data-rq>Tolak</button><button class="btn r" data-rq>Terima</button></div></div>
+      <div class="card rq"><div class="row"><span class="av"><i data-i="img"></i></span><div><b>Nama Teman</b><div class="mu sm">#23456 · 10 menit lalu</div></div></div><div class="row"><button class="btn" data-rq>Tolak</button><button class="btn r" data-rq>Terima</button></div></div>
+      <div class="card rq"><div class="row"><span class="av"><i data-i="img"></i></span><div><b>Nama Teman</b><div class="mu sm">#34567 · 1 jam lalu</div></div></div><div class="row"><button class="btn" data-rq>Tolak</button><button class="btn r" data-rq>Terima</button></div></div>
+      <button class="btn o" data-soon>Tambahkan Teman</button>
+    </div>
+  </div>
+</section>
+
+<!-- Kode QR -->
+<section class="scr" id="qr" data-nav="0">
+  <div class="top" style="justify-content:flex-start"><button class="ic n" data-back aria-label="Kembali"><i data-i="back"></i></button><h1 style="font-size:22px">Kode QR</h1></div>
+  <div class="tabs"><button data-t="p" class="on">Pindai</button><button data-t="k">Kode Saya</button></div>
+  <div class="bd" style="padding-top:28px">
+    <div class="pn on ctr" data-p="p">
+      <h2 style="font-size:20px;margin:36px 0 28px">Lanjutkan dengan memindai<br>kode QR</h2>
+      <div class="ph qr" style="border:3px solid #fff;height:320px;aspect-ratio:auto"><i data-i="cam2"></i><span>Kamera kamu</span></div>
+    </div>
+    <div class="pn ctr" data-p="k">
+      <div class="av" style="width:78px;height:78px;margin:12px auto 18px;color:var(--ac)"><i data-i="img"></i></div>
+      <h2 style="font-size:18px;margin:0 0 16px">Nickname #1232131</h2>
+      <div class="ph qr" style="max-width:256px;margin:0 auto"><i data-i="img"></i><span>qr akun kamu</span></div>
+      <div class="row" style="justify-content:center;margin-top:24px"><button class="btn row" style="width:auto;gap:8px;font-weight:600" data-soon><i data-i="share" style="width:18px"></i>Bagikan</button><button class="btn row" style="width:auto;gap:8px;font-weight:600" data-soon><i data-i="cp" style="width:18px"></i>Salin</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 Komunitas: daftar kanal -->
+<section class="scr c" id="komunitas" data-tab="komunitas">
+  <div class="cm">
+    <div class="rail"><button data-go="komunitas"><i data-i="img"></i></button><button class="on" data-go="komunitas"><i data-i="img"></i><em>4</em></button><button data-go="komunitas"><i data-i="img"></i><em>66</em></button><button data-go="komunitas"><i data-i="img"></i></button><button data-go="komunitas"><i data-i="img"></i></button><button data-go="komunitas"><i data-i="img"></i></button><button class="add" data-go="tambah" aria-label="Tambah server"><i data-i="plus"></i></button></div>
+    <div class="chn">
+      <div class="row b" style="font-size:19px;gap:8px">Nama Server <i data-i="rt" style="width:16px;color:var(--mu)"></i></div>
+      <label class="sch" style="margin:14px 0 0;justify-content:center;padding:9px"><i data-i="find" style="width:16px"></i><span>Search</span></label>
+      <div class="cat" style="margin-top:22px">Nama Topik ⌄</div>
+      <button class="ch" data-go="chat"><i data-i="hash"></i>Nama Topik</button>
+      <button class="ch" data-go="chat"><i data-i="hash"></i>Nama Topik</button>
+      <div class="cat">Nama Topik ⌄</div>
+      <button class="ch on" data-go="chat"><i data-i="hash"></i>Nama Topik</button>
+      <button class="ch" data-go="chat"><i data-i="hash"></i>Nama Topik</button>
+      <button class="ch u" data-go="chat"><i data-i="hash"></i>Nama Topik</button>
+      <div class="cat">Bagian Voice Chat ⌄</div>
+      <button class="ch" data-go="voice"><i data-i="spk"></i>Nama Topik</button>
+      <button class="ch" data-go="voice"><i data-i="spk"></i>Nama Topik</button>
+      <button class="ch" data-go="voice"><i data-i="spk"></i>Nama Topik</button>
+    </div>
+  </div>
+</section>
+
+<!-- Chat -->
+<section class="scr c" id="chat" data-tab="komunitas">
+  <div class="top" style="border-bottom:1px solid var(--ln)"><div class="row"><button class="ic n" data-back aria-label="Kembali"><i data-i="back"></i></button><div><b style="font-size:17px" class="row"># Nama Topik <i data-i="rt" style="width:14px"></i></b><div class="mu sm row" style="gap:6px"><span class="dot" style="position:static;background:var(--gr);width:8px;height:8px;border:0"></span>12 online</div></div></div><button data-soon aria-label="Cari pesan"><i data-i="find"></i></button></div>
+  <div class="bd" style="padding:18px 20px 0">
+    <div class="row mu sm" style="gap:12px;margin-bottom:8px"><i data-i="arr" style="color:var(--gr)"></i>Nickname 01 baru saja bergabung.</div>
+    <button class="react" style="margin:0 0 20px 34px;padding:8px 12px" data-soon><i data-i="smi" style="width:16px"></i><span style="color:var(--tx)">Sapa anggota baru</span></button>
+    <div class="msg"><span class="av"><i data-i="img"></i></span><div><b>Nickname 02</b> <span class="mu sm">19.02</span><p>Malam semua! Ada yang mau mabar jam 8 nanti?</p></div></div>
+    <div class="msg"><span class="av"><i data-i="img"></i></span><div><b>Nickname 03</b> <span class="mu sm">19.03</span><p>Aku ikut. Kita main santai dulu, ya.</p><span class="react"><i data-i="up" style="width:16px"></i>3</span></div></div>
+    <div class="day">Hari ini</div>
+    <div class="msg"><span class="av"><i data-i="img"></i></span><div><b>Nickname 01</b> <span class="mu sm">19.05</span><p>Boleh! Aku baru selesai update. Nanti kirim undangannya di sini.</p></div></div>
+    <div class="msg"><span class="av"><i data-i="img"></i></span><div><div class="reply">↪ Nickname 03 · Kita main santai dulu, ya.</div><b>Nickname 02</b> <span class="mu sm">19.06</span><p><span class="men">@Nickname 03</span><br>Setuju, pemanasan satu match dulu. Aku buat room-nya sekarang.</p></div></div>
+    <div class="msg"><span class="av"><i data-i="img"></i></span><div><b>Nickname 04</b> <span class="mu sm">19.08</span><p>Siap, aku masuk voice 5 menit lagi. Sisakan satu slot buat aku, ya!</p></div></div>
+  </div>
+  <label class="cmp"><i data-i="plus"></i><input placeholder="Pesan #Nama Topik" aria-label="Tulis pesan"><i data-i="gft"></i><i data-i="smi"></i><i data-i="mic"></i></label>
+</section>
+
+<!-- Voice chat -->
+<section class="scr c" id="voice" data-tab="komunitas">
+  <div class="top" style="position:absolute;left:0;right:0;top:0"><div class="row"><button class="ic" data-back aria-label="Tutup"><i data-i="dn"></i></button><b style="font-size:16px" class="row">Nama Topik <i data-i="rt" style="width:14px;color:var(--mu)"></i></b></div><div class="row" style="gap:8px"><button class="ic" style="background:#fff;color:#111" data-soon aria-label="Speaker"><i data-i="spk" style="width:18px"></i></button><button class="ic" data-soon aria-label="Undang"><i data-i="usr" style="width:18px"></i></button><button class="ic" data-go="chat" aria-label="Chat"><i data-i="mp" style="width:18px"></i></button></div></div>
+  <div class="vgrid">
+    <div class="vt"><i data-i="img"></i><span>Nickname 01</span></div><div class="vt"><i data-i="img"></i><span>Nickname 02</span></div>
+    <div class="vt"><i data-i="img"></i><span>Nickname 03</span></div><div class="vt"><i data-i="img"></i><span>Nickname 04</span></div>
+  </div>
+  <div class="vbar"><button data-soon aria-label="Kamera"><i data-i="cam"></i></button><button data-soon aria-label="Mikrofon"><i data-i="mic"></i></button><button data-soon aria-label="Bagikan layar"><i data-i="ph"></i></button><button data-soon aria-label="Aktivitas"><i data-i="fun"></i></button><button class="end" data-back aria-label="Akhiri"><i data-i="end"></i></button></div>
+</section>
+
+<!-- 06 Tambah server -->
+<section class="scr c" id="tambah" data-tab="komunitas">
+  <div class="cm">
+    <div class="rail"><button data-go="komunitas"><i data-i="img"></i></button><button data-go="komunitas"><i data-i="img"></i><em>4</em></button><button data-go="komunitas"><i data-i="img"></i><em>66</em></button><button data-go="komunitas"><i data-i="img"></i></button><button data-go="komunitas"><i data-i="img"></i></button><button data-go="komunitas"><i data-i="img"></i></button><button class="add on" aria-label="Tambah server"><i data-i="plus"></i></button></div>
+    <div class="chn">
+      <div class="b" style="font-size:19px">Servers</div>
+      <h2 style="margin:12px 0 6px;font-size:16px">Buat Komunitas untuk bermain bersama</h2>
+      <p class="mu">Komunitas memungkinkan anda untuk melakukan obrolan suara dan berbagi pesan</p>
+      <div class="g2" style="margin:16px 0"><div class="card cp" style="margin:0;padding:16px 12px"><i data-i="img" style="width:30px"></i><div class="b" style="margin:20px 0 6px">Game</div><div class="mu sm">Berbagi pengalaman bermain game</div></div><div class="card cp" style="margin:0;padding:16px 12px"><i data-i="img" style="width:30px"></i><div class="b" style="margin:20px 0 6px">Hobi</div><div class="mu sm">Tempat untuk berbagi hobi bersama</div></div></div>
+      <button class="btn r" data-go="template">Buat Komunitas</button>
+      <button class="btn" style="margin-top:12px;font-weight:600" data-soon>Aku sudah punya</button>
+      <h2 style="margin-top:22px;font-size:16px">Gabung Komunitas</h2>
+      <p class="mu">Cari komunitas yang sesuai dengan keinginan anda</p>
+    </div>
+  </div>
+</section>
+
+<section class="scr c" id="template" data-tab="komunitas">
+  <div class="top"><button class="ic n" data-back aria-label="Tutup"><i data-i="x"></i></button></div>
+  <div class="bd ctr"><h1>Buat Komunitas Anda</h1><p class="mu" style="margin-bottom:22px">Komunitas anda, dimana anda berbagi pengalaman bersama.</p>
+    <div class="opt" style="margin-bottom:22px;text-align:left"><button data-go="jenis"><i data-i="img"></i>Buat Untuk Diri Sendiri</button></div>
+    <div class="mu sm" style="text-align:left;margin-bottom:8px">Template</div>
+    <div class="opt" style="text-align:left"><button data-go="jenis"><i data-i="img"></i>Nama template</button><button data-go="jenis"><i data-i="img"></i>Nama template</button><button data-go="jenis"><i data-i="img"></i>Nama template</button><button data-go="jenis"><i data-i="img"></i>Nama template</button><button data-go="jenis"><i data-i="img"></i>Nama template</button><button data-go="jenis"><i data-i="img"></i>Nama template</button></div>
+  </div>
+</section>
+
+<section class="scr c" id="jenis" data-tab="komunitas">
+  <div class="top"><button class="ic n" data-back aria-label="Kembali"><i data-i="back"></i></button></div>
+  <div class="bd ctr"><h1 style="margin-top:20px">Ceritakan Tentang Servermu</h1><p class="mu" style="margin-bottom:22px">Agar kami bisa membantu menyiapkannya, server ini untuk beberapa teman atau komunitas yang lebih besar?</p>
+    <div class="opt" style="text-align:left"><button data-go="atur"><i data-i="img"></i>Untuk saya dan teman-teman</button><button data-go="atur"><i data-i="img"></i>Untuk klub atau komunitas</button></div>
+  </div>
+</section>
+
+<section class="scr c" id="atur" data-tab="komunitas">
+  <div class="top"><button class="ic n" data-back aria-label="Kembali"><i data-i="back"></i></button></div>
+  <div class="bd ctr"><h1 style="margin-top:12px">Buat Servermu</h1><p class="mu">Server adalah tempat kamu dan teman-teman berkumpul.<br>Buat servermu dan mulai mengobrol.</p>
+    <button class="up" data-soon aria-label="Unggah ikon server"><span><i data-i="img"></i><br>UNGGAH</span><span class="pl"><i data-i="plus"></i></span></button>
+    <label class="mu sm" style="display:block;text-align:left">Nama Server<input class="fld" placeholder="Nama Server" id="sname"></label>
+    <p class="mu sm" style="text-align:left;margin-bottom:22px">Dengan membuat server, kamu menyetujui <a href="#" data-soon>Pedoman Komunitas</a> Koga.</p>
+    <button class="btn r" data-go="komunitas" data-reset>Buat Server</button>
+  </div>
+</section>
+
+<nav id="nav" hidden>
+  <button data-go="artikel" data-n="artikel"><i data-i="art"></i>Artikel</button>
+  <button data-go="esports" data-n="esports"><i data-i="cup"></i>Esports</button>
+  <button class="k" data-go="komunitas" data-n="komunitas"><span class="kg">KG</span>Komunitas</button>
+  <button data-go="teman" data-n="teman"><i data-i="usr"></i>Teman</button>
+  <button data-go="profil" data-n="profil"><i data-i="me"></i>Profil</button>
+</nav>
+<div id="toast" role="status">Segera hadir</div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const icons=()=>$$('i[data-i]').forEach(e=>{if(!e.firstChild)e.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#'+e.dataset.i+'"/></svg>'});
+icons();
+let cur,hist=[],tt;
+function show(id){
+  cur=id;const s=$('#'+id);
+  $$('.scr').forEach(x=>x.classList.toggle('on',x===s));
+  $('#nav').hidden=s.dataset.nav==='0';
+  $$('#nav button').forEach(b=>{const on=b.dataset.n===s.dataset.tab;b.classList.toggle('on',on);on?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current')});
+  const b=s.querySelector('.bd');if(b)b.scrollTop=0;
+  $('#gmenu').classList.remove('on');
+  socialScreen(id);
+  loaders[id]?.();
+}
+function go(id,reset){
+  if(reset)hist=[];else if(cur)hist.push(cur);
+  show(id);
+}
+// ---- API dan tampilan data ----
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const api=async(u,o={})=>{
+  try{
+    const r=await fetch(u,{method:o.method||'GET',headers:o.body?{'Content-Type':'application/json'}:{},body:o.body?JSON.stringify(o.body):undefined});
+    return{ok:r.ok,status:r.status,data:await r.json().catch(()=>({}))};
+  }catch{return{ok:false,status:0,data:{error:'Tidak bisa terhubung ke server.'}}}
+};
+const TYPE={artikel:'Artikel',streaming:'Streaming',esports:'Esports',patch:'Catatan Patch'};
+const ago=d=>{const m=Math.max(0,(Date.now()-new Date(d))/6e4|0);return m<1?'Baru saja':m<60?m+' Menit Lalu':m<1440?(m/60|0)+' Jam Lalu':(m/1440|0)+' H Lalu'};
+const dayLbl=d=>new Date(d).toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const clip=s=>s.length>120?s.slice(0,120)+'...':s;
+const box=(t,x)=>`<div style="text-align:center;padding:40px 16px;color:var(--mu);border:1px dashed #3a3a3a;border-radius:16px"><b style="display:block;color:var(--tx);font-size:16px;margin-bottom:6px">${t}</b>${x||''}</div>`;
+const RETRY='<button class="b" data-retry style="color:var(--tx);text-decoration:underline">Coba lagi</button>';
+const fail=r=>box('Gagal memuat',`${esc(r.data.error||'')} ${RETRY}`);
+const img=(u,alt)=>`<img src="${esc(u)}" alt="${alt||''}" style="width:100%;height:100%;object-fit:cover">`;
+const ph=(u,label,h,alt)=>`<div class="ph"${h?` style="height:${h}px"`:''}>${u?img(u,alt):`<i data-i="img"></i><span>${label}</span>`}</div>`;
+// Isi wadah dari API: memuat, kosong, atau gagal. Respons lama yang terlambat dibuang.
+async function fill(el,url,draw,none){
+  const t=el._t=(el._t||0)+1;
+  if(!el.firstChild)el.innerHTML=box('Memuat...');
+  const r=await api(url);
+  if(t!==el._t)return;
+  el.innerHTML=!r.ok?fail(r):r.data.items.length?draw(r.data.items):none;
+  icons();
+}
+const article=i=>`<div class="card" data-go="detail" data-id="${i.id}" data-title="${esc(i.title)}" data-type="Artikel" tabindex="0" role="link">${ph(i.img,'Foto artikel',195,esc(i.title))}<div class="cp"><div class="b" style="font-size:16px">${esc(i.title)}</div><p class="mu" style="margin:6px 0 20px">${esc(clip(i.desc))}</p><div class="row sp mu sm"><b>${ago(i.date)}</b><i data-i="share"></i></div></div></div>`;
+const stream=i=>`<div class="card stream">${ph(i.img,'Foto streaming',0,esc(i.title))}<div class="b" style="font-size:16px">${esc(i.title)}</div><div class="row sp mu sm" style="margin-top:8px"><span>${ago(i.date)}</span><i data-i="share"></i></div></div>`;
+const patch=([h,...r])=>`<div class="hero"><div class="ph" style="height:150px;background:none">${h.img?img(h.img,esc(h.title)):'<i data-i="img"></i><span>Foto catatan patch</span>'}</div><div class="b" style="font-size:22px;margin-top:40px">${esc(h.title)}</div><p class="mu" style="margin:8px 0 4px">${esc(clip(h.desc))}</p><p class="mu sm">${ago(h.date)}</p><div class="row sp" style="margin-top:14px"><button class="btn" style="width:auto;padding:12px 14px;border-radius:8px" data-go="detail" data-id="${h.id}" data-title="${esc(h.title)}" data-type="Catatan Patch">Lihat Catatan Patch</button><button data-soon aria-label="Ingatkan saya"><i data-i="bell"></i></button></div></div>`
+  +(r.length?'<h2>Catatan Terbaru</h2>'+r.map(i=>`<div class="card row cp" style="gap:16px" data-go="detail" data-id="${i.id}" data-title="${esc(i.title)}" data-type="Catatan Patch" tabindex="0" role="link"><div class="ph" style="width:104px;height:104px;border-radius:10px;flex:none;overflow:hidden">${i.img?img(i.img,esc(i.title)):'<i data-i="img"></i><span>Foto patch</span>'}</div><div><p>${esc(i.title)}</p><p class="mu sm" style="margin-top:18px">${ago(i.date)}</p></div></div>`).join(''):'');
+const team=(n,left)=>left?`<span class="team">${esc(n)} <b><i data-i="img"></i></b></span>`:`<span class="team"><b><i data-i="img"></i></b> ${esc(n)}</span>`;
+const sc=(a,b,big)=>big?`<span class="b" style="font-size:18px">${a}</span>`:`<span class="score"${a>b?' style="color:#fff"':''}>${a}</span>`;
+const mrow=(i,big)=>`<div class="row sp">${team(i.ta,1)}${i.st==='akan'?'<span class="mu b">VS</span>':sc(i.sa,i.sb,big)+sc(i.sb,i.sa,big)}${team(i.tb,0)}</div>`;
+const BADGE='<span class="live" style="position:absolute;top:10px;right:10px;border-radius:6px;padding:6px 10px">';
+const mph=i=>`<div class="ph" style="position:relative">${i.st==='live'?BADGE+'Live</span>':i.st==='selesai'?BADGE+'<i data-i="play" style="width:14px"></i></span>':''}${i.img?img(i.img,`${esc(i.ta)} vs ${esc(i.tb)}`):'<i data-i="img"></i><span>Foto pertandingan</span>'}</div>`;
+const feedMatch=i=>`<div class="card match">${mph(i)}<div class="cp">${mrow(i)}<div class="row sp" style="margin-top:14px"><div class="b">${esc(i.tour)}<div class="mu sm" style="font-weight:400">${esc(i.bo)}</div></div><i data-i="share"></i></div></div></div>`;
+const match=i=>`<div class="card match">${mph(i)}<div class="cp">${mrow(i,1)}</div><div class="rd"><span>${esc(i.tour)}<br><small class="mu">${esc(i.bo)}</small></span><button class="ic" data-soon aria-label="Bagikan"><i data-i="share"></i></button></div></div>`;
+const days=a=>{let last='';return a.map(i=>{const d=dayLbl(i.date),h=d===last?'':`<p class="mu b" style="margin-bottom:12px">${d}</p>`;last=d;return h+match(i)}).join('')};
+
+async function loadProfile(){
+  const r=await api('/api/me');
+  if(r.status===401){go('welcome',true);return}
+  if(!r.ok)return;
+  socialSession(r.data.user);
+  $('#pname').textContent=r.data.user.username;$('#pnum').textContent='#'+r.data.user.tag;$('#pstat').textContent=r.data.user.status_text||'Online';
+}
+function loadFeed(){
+  const f=(id,type,draw,t,x)=>fill($('#'+id),'/api/feed?type='+type,draw,box(t,x));
+  f('fa','artikel',a=>a.map(article).join(''),'Belum ada artikel','Belum ada artikel yang terbit. Cek lagi nanti atau buka tab Catatan Patch.');
+  f('fs','streaming',a=>a.map(stream).join(''),'Belum ada streaming','Belum ada streaming yang terdaftar. Cek lagi nanti.');
+  f('fe','esports',a=>a.map(feedMatch).join(''),'Belum ada pertandingan','Belum ada pertandingan yang terdaftar. Cek lagi nanti.');
+  f('fp','patch',patch,'Belum ada catatan patch','Belum ada catatan patch yang terbit. Cek lagi nanti.');
+}
+let did,game='',tour='';
+async function loadDetail(){
+  if(!did)return;
+  const id=did;
+  $('#dbody').textContent='Memuat...';$('#ddate').textContent='';$('#dimg').innerHTML='<i data-i="img"></i><span>Foto konten</span>';icons();
+  const r=await api('/api/content/'+encodeURIComponent(id));
+  if(id!==did)return;
+  if(!r.ok){$('#dbody').innerHTML=`${esc(r.data.error||'Gagal memuat.')} ${RETRY}`;return}
+  const c=r.data;
+  $('#dtype').textContent=TYPE[c.type];$('#dtitle').textContent=c.title;$('#ddate').textContent=ago(c.date);
+  if(c.img)$('#dimg').innerHTML=img(c.img,esc(c.title));
+  $('#dbody').textContent=c.desc||'Belum ada isi lengkap untuk konten ini.';
+}
+const PLUS='<button class="ic n" style="margin:10px 0 0 auto" data-soon aria-label="Tambah turnamen"><i data-i="plus"></i></button>';
+async function loadEsports(){
+  const r=await api('/api/games');
+  if(!r.ok){$('#mnext').innerHTML=$('#mprev').innerHTML=fail(r);return}
+  const gs=r.data.items;
+  if(!gs.includes(game))game=gs[0]||'';
+  $('#glbl').textContent=game||'Belum ada game';
+  $('#gmenu').innerHTML=gs.map(g=>`<button data-g="${esc(g)}"${g===game?' class="on"':''}><i data-i="img"></i>${esc(g)}</button>`).join('');
+  loadTours();
+}
+async function loadTours(){
+  const r=game?await api('/api/tournaments?game='+encodeURIComponent(game)):{ok:true,data:{items:[]}};
+  const ts=r.ok?r.data.items:[];
+  if(!ts.includes(tour))tour='';
+  $('#tours').innerHTML=(game?[['','Semua'],...ts.map(t=>[t,t])]:[]).map(([v,l])=>`<div class="tur"><button class="chip${v===tour?' on':''}" data-tour="${esc(v)}"><i data-i="img"></i></button>${esc(l)}</div>`).join('')+PLUS;
+  icons();loadMatches();
+}
+function loadMatches(){
+  const A=$('#mnext'),B=$('#mprev');
+  if(!game){
+    A._t=(A._t||0)+1;B._t=(B._t||0)+1;
+    A.innerHTML=box('Belum ada pertandingan','Belum ada pertandingan esports yang terdaftar. Cek lagi nanti.');
+    B.innerHTML=A.innerHTML;return;
+  }
+  const q=s=>'/api/matches?game='+encodeURIComponent(game)+'&tour='+encodeURIComponent(tour)+'&status='+s;
+  fill(A,q('akan,live'),days,box('Belum ada jadwal','Tidak ada pertandingan mendatang untuk pilihan ini. Coba turnamen lain atau cek tab Pertandingan Sebelumnya.'));
+  fill(B,q('selesai'),days,box('Belum ada hasil','Belum ada pertandingan selesai untuk pilihan ini.'));
+}
+const loaders={profil:loadProfile,artikel:loadFeed,esports:loadEsports,detail:loadDetail};
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button,a,[data-go]');if(!t)return;
+  if(t.dataset.retry!==undefined){loaders[cur]?.();return}
+  if(t.dataset.logout!==undefined){
+    api('/api/logout',{method:'POST'}).then(r=>{if(!r.ok){socialNotice(r.data.error);return}socialSession(null);game=tour='';$('#pname').textContent=$('#pnum').textContent=$('#pstat').textContent='';go('welcome',true)});
+    return}
+  if(t.dataset.back!==undefined){show(hist.pop()||'profil');return}
+  if(t.closest('#nav')){go(t.dataset.go,true);return}
+  if(t.dataset.go){
+    if(t.dataset.title){$('#dtitle').textContent=t.dataset.title;$('#dtype').textContent=t.dataset.type}
+    if(t.dataset.id)did=t.dataset.id;
+    go(t.dataset.go,t.dataset.reset!==undefined);
+    if(t.dataset.open)$('#'+t.dataset.go+' [data-t='+t.dataset.open+']').click();
+    return}
+  if(t.dataset.t){
+    const s=t.closest('.scr');
+    s.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b===t));
+    s.querySelectorAll('.pn').forEach(p=>p.classList.toggle('on',p.dataset.p===t.dataset.t));
+    return;
+  }
+  if(t.id==='gbtn'){const m=$('#gmenu').classList.toggle('on');t.setAttribute('aria-expanded',m);return}
+  if(t.dataset.g){
+    $('#glbl').textContent=t.dataset.g;
+    $$('#gmenu button').forEach(b=>b.classList.toggle('on',b===t));
+    $('#gmenu').classList.remove('on');
+    game=t.dataset.g;tour='';loadTours();return;
+  }
+  if(t.matches('.chip')&&t.parentElement.classList.contains('chips')||t.closest('.tur')){
+    t.closest('.chips').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===t));
+    if(t.dataset.tour!==undefined){tour=t.dataset.tour;loadMatches()}
+    return;
+  }
+  if(t.dataset.soon!==undefined){
+    e.preventDefault();const o=$('#toast');o.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>o.classList.remove('on'),1400);
+  }
+});
+document.addEventListener('submit',async e=>{
+  e.preventDefault();const f=e.target,er=f.querySelector('.err'),i=[...f.querySelectorAll('input')],pw=f.querySelectorAll('[type=password]');
+  let m=i.some(x=>!x.value.trim())?'Isi semua kolom dulu.':'';
+  if(!m&&f.dataset.p==='d'){
+    if(!/^\S+@\S+\.\S+$/.test(i[1].value))m='Format email belum benar.';
+    else if(pw[0].value.length<8)m='Password minimal 8 karakter.';
+    else if(pw[0].value!==pw[1].value)m='Password dan konfirmasi tidak sama.';
+  }
+  er.textContent=m;if(m)return;
+  const reg=f.dataset.p==='d',btn=f.querySelector('[type=submit]');
+  btn.disabled=true;
+  let r=await api(reg?'/api/register':'/api/login',{method:'POST',body:reg?{username:i[0].value.trim(),email:i[1].value.trim(),password:pw[0].value}:{id:i[0].value.trim(),password:pw[0].value}});
+  if(r.ok&&reg)r=await api('/api/login',{method:'POST',body:{id:i[0].value.trim(),password:pw[0].value}}); // daftar lalu langsung masuk
+  btn.disabled=false;
+  if(!r.ok){er.textContent=r.data.error||'Gagal. Coba lagi.';return}
+  socialSession(r.data.user);f.reset();go(f.dataset.next,true);
+});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('[role=link]'))e.target.click()});
+</script>
+<script src="/social.js"></script>
+<script src="/voice-qr.js"></script>
+</body>
+</html>
